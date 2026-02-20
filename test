@@ -1,0 +1,32 @@
+docker network ls
+docker compose logs mariadb
+docker ps
+docker volume ls
+docker exec -it wordpress sh
+
+netstat -tlnp
+
+
+sudo rm -rf /home/sskobyak/data/db/*
+
+
+MYSQL ==============================
+docker exec -it mariadb sh
+mysql -u root -p
+        pwdroot
+    show databases;
+    SELECT user FROM mysql.user; 
+    use wordpress;
+    show tables;
+    exit;
+
+
+FTP ==============================
+sudo apt install ftp
+ftp localhost
+        ftpuser
+        pwdftp
+
+REDIS ==============================
+docker exec -it wordpress sh
+php81 -r '$r = new Redis(); var_dump($r->connect("redis", 6379));'

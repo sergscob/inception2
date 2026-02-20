@@ -1,0 +1,13 @@
+{
+  "name": "vueapp",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "vue": "^3.3.4"
+  },
+  "devDependencies": {
+    "@vue/cli-service": "^5.0.7"
+  }
+}

@@ -1,0 +1,157 @@
+version: "3.9"
+
+services:
+  mariadb:
+    build: ./srcs/mariadb
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    env_file: .env
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - network
+
+  wordpress:
+    build: ./srcs/wordpress
+    image: wordpress
+    container_name: wordpress
+    restart: always
+    env_file: .env
+    volumes:
+      - wp_data:/var/www/html
+    depends_on:
+      - mariadb
+    networks:
+      - network
+
+  nginx:
+    build: ./srcs/nginx
+    image: nginx
+    container_name: nginx
+    restart: always
+    ports:
+      - "443:443"
+    volumes:
+      - wp_data:/var/www/html
+    depends_on:
+      - wordpress
+    networks:
+      - network
+
+  ftp:
+    build: ./srcs/ftp
+    image: ftp
+    container_name: ftp
+    restart: always
+    env_file: .env
+    ports:
+      - "21:21"
+      - "30000-30009:30000-30009"
+    volumes:
+      - wp_data:/var/www/html
+    networks:
+      - network
+
+  redis:
+    build: ./srcs/redis
+    container_name: redis
+    restart: always
+    networks:
+      - network
+
+  adminer:
+    build: ./srcs/adminer
+    container_name: adminer
+    restart: always
+    networks:
+      - network
+
+  vueapp:
+    build: ./srcs/vueapp
+    container_name: vueapp
+    restart: always
+    ports:
+      - "8080:80"   # сайт доступен на 8080
+    networks:
+      - network
+
+  profile:
+    build: ./srcs/profile
+    container_name: profile
+    restart: always
+    ports:
+      - "8081:80"   # сайт доступен на 8081
+    networks:
+      - network
+
+  netdata:
+    build: ./srcs/netdata   # или image: netdata/netdata:stable
+    container_name: netdata
+    restart: unless-stopped
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor:unconfined
+    volumes:
+      - netdata_config:/etc/netdata       # конфиги
+      - netdata_lib:/var/lib/netdata      # сохраняет netdata_random_session_id
+      - netdata_cache:/var/cache/netdata  # кэш метрик
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/passwd:/host/etc/passwd:ro
+      - /etc/group:/host/etc/group:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - network
+
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      - network
+
+  # cadvisor:
+  #     container_name: cadvisor
+  #     build: ./srcs/cadvisor/.
+  #     image: cadvisor:42
+  #     ports:
+  #       - "8080:8080"
+  #     networks:
+  #       - network
+  #     volumes:
+  #       - /:/rootfs:ro
+  #       - /var/run:/var/run:ro 
+  #       - /sys:/sys:ro 
+  #       - /var/lib/docker/:/var/lib/docker:ro
+  #     restart: always      
+
+volumes:
+  db_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/sskobyak/data/db
+      o: bind
+
+  wp_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/sskobyak/data/wp
+      o: bind
+
+  netdata_lib:
+  netdata_cache:
+  netdata_config:
+
+  portainer_data:
+networks:
+  network:
+    driver: bridge

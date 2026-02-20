@@ -1,0 +1,27 @@
+In your WordPress database, there must be two users, one of them being the administrator.
+
+It is strongly recommended that you use Docker secrets to store any confidential information
+/secrets
+
+Any credentials found in your Git repository will result in project failure.
+
+README.md
+
+USER_DOC.md
+
+DEV_DOC.md 
+
+BONUS
+Dockerfile must be written for each additional service
+
++redis cache
+
++FTP server container pointing to the volume of your WordPress website.
+
+static website in the language of your choice except PHP. For example, a showcase site or a site for presenting your resume
+
+Adminer
+
+Set up a service of your choice that you think is useful
+
+VM
