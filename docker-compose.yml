@@ -55,6 +55,7 @@ services:
 
   redis:
     build: ./srcs/redis
+    image: redis
     container_name: redis
     restart: always
     networks:
@@ -62,6 +63,7 @@ services:
 
   adminer:
     build: ./srcs/adminer
+    image: adminer
     container_name: adminer
     restart: always
     networks:
@@ -69,6 +71,7 @@ services:
 
   vueapp:
     build: ./srcs/vueapp
+    image: vueapp
     container_name: vueapp
     restart: always
     ports:
@@ -79,6 +82,7 @@ services:
   profile:
     build: ./srcs/profile
     container_name: profile
+    image: profile
     restart: always
     ports:
       - "8081:80"   # сайт доступен на 8081
@@ -88,6 +92,7 @@ services:
   netdata:
     build: ./srcs/netdata   # или image: netdata/netdata:stable
     container_name: netdata
+    image: netdata
     restart: unless-stopped
     cap_add:
       - SYS_PTRACE
@@ -105,32 +110,32 @@ services:
     networks:
       - network
 
-  portainer:
-    image: portainer/portainer-ce:latest
-    container_name: portainer
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    networks:
-      - network
+  # portainer:
+  #   container_name: portainer
+  #   image: portainer
+  #   restart: unless-stopped
+  #   ports:
+  #     - "9000:9000"
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - portainer_data:/data
+  #   networks:
+  #     - network
 
-  # cadvisor:
-  #     container_name: cadvisor
-  #     build: ./srcs/cadvisor/.
-  #     image: cadvisor:42
-  #     ports:
-  #       - "8080:8080"
-  #     networks:
-  #       - network
-  #     volumes:
-  #       - /:/rootfs:ro
-  #       - /var/run:/var/run:ro 
-  #       - /sys:/sys:ro 
-  #       - /var/lib/docker/:/var/lib/docker:ro
-  #     restart: always      
+  cadvisor:
+      container_name: cadvisor
+      build: ./srcs/cadvisor/.
+      image: cadvisor:42
+      ports:
+        - "8080:8080"
+      networks:
+        - network
+      volumes:
+        - /:/rootfs:ro
+        - /var/run:/var/run:ro 
+        - /sys:/sys:ro 
+        - /var/lib/docker/:/var/lib/docker:ro
+      restart: always      
 
 volumes:
   db_data:

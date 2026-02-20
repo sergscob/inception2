@@ -7,6 +7,8 @@ down:
 	docker compose -f ./docker-compose.yml down
 
 re:
+	mkdir -p /home/sskobyak/data/wp
+	mkdir -p /home/sskobyak/data/db
 	docker compose -f ./docker-compose.yml down -v
 	docker compose -f ./docker-compose.yml up -d --build
 
