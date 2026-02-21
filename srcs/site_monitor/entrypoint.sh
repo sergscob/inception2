@@ -3,11 +3,11 @@ set -e
 
 echo "🚀 Starting site monitor container..."
 
-# Активируем виртуальное окружение
+# virtual environment activation
 . /venv/bin/activate
 
-# Отправка уведомления при старте
+# send startup notification
 python /app/monitor.py --startup
 
-# Запуск основного мониторинга
+# run the monitor
 python /app/monitor.py
