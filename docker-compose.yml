@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   mariadb:
     build: ./srcs/mariadb
@@ -88,54 +86,25 @@ services:
       - "8081:80"   # сайт доступен на 8081
     networks:
       - network
-
-  netdata:
-    build: ./srcs/netdata   # или image: netdata/netdata:stable
-    container_name: netdata
-    image: netdata
-    restart: unless-stopped
-    cap_add:
-      - SYS_PTRACE
-    security_opt:
-      - apparmor:unconfined
-    volumes:
-      - netdata_config:/etc/netdata       # конфиги
-      - netdata_lib:/var/lib/netdata      # сохраняет netdata_random_session_id
-      - netdata_cache:/var/cache/netdata  # кэш метрик
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /etc/passwd:/host/etc/passwd:ro
-      - /etc/group:/host/etc/group:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks:
-      - network
-
-  # portainer:
-  #   container_name: portainer
-  #   image: portainer
-  #   restart: unless-stopped
-  #   ports:
-  #     - "9000:9000"
-  #   volumes:
-  #     - /var/run/docker.sock:/var/run/docker.sock
-  #     - portainer_data:/data
-  #   networks:
-  #     - network
-
-  cadvisor:
-      container_name: cadvisor
-      build: ./srcs/cadvisor/.
-      image: cadvisor:42
+  portainer:
+      build: ./srcs/portainer
+      container_name: portainer
+      restart: unless-stopped
       ports:
-        - "8080:8080"
+        - "9000:9000"
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        - portainer_data:/data
       networks:
         - network
-      volumes:
-        - /:/rootfs:ro
-        - /var/run:/var/run:ro 
-        - /sys:/sys:ro 
-        - /var/lib/docker/:/var/lib/docker:ro
-      restart: always      
+
+  site_monitor:
+    build: ./srcs/site_monitor
+    container_name: site_monitor
+    restart: always
+    env_file: .env
+    networks:
+      - network
 
 volumes:
   db_data:
@@ -152,11 +121,8 @@ volumes:
       device: /home/sskobyak/data/wp
       o: bind
 
-  netdata_lib:
-  netdata_cache:
-  netdata_config:
-
   portainer_data:
+
 networks:
   network:
     driver: bridge
