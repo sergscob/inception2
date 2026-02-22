@@ -52,6 +52,27 @@ if ! /usr/bin/php81 /usr/local/bin/wp core is-installed --allow-root --path="$WP
 
     echo "WordPress installed."
 
+    # Добавляем второго пользователя
+    SECOND_USER_LOGIN="${WP_SECOND_USER:-editor}"
+    SECOND_USER_PASS="${WP_SECOND_USER_PASSWORD:-editor123}"
+    SECOND_USER_EMAIL="${WP_SECOND_USER_EMAIL:-editor@example.com}"
+    SECOND_USER_ROLE="${WP_SECOND_USER_ROLE:-editor}"
+
+    # Проверяем, есть ли уже пользователь
+    if ! /usr/bin/php81 /usr/local/bin/wp user get "$SECOND_USER_LOGIN" --allow-root --path="$WP_PATH" >/dev/null 2>&1; then
+        echo "Creating second user: $SECOND_USER_LOGIN..."
+        /usr/bin/php81 /usr/local/bin/wp user create \
+            "$SECOND_USER_LOGIN" "$SECOND_USER_EMAIL" \
+            --user_pass="$SECOND_USER_PASS" \
+            --role="$SECOND_USER_ROLE" \
+            --allow-root \
+            --path="$WP_PATH"
+        echo "Second user created."
+    else
+        echo "Second user $SECOND_USER_LOGIN already exists."
+    fi
+
+
     # Проверяем и устанавливаем плагин Redis Object Cache
     if ! /usr/bin/php81 /usr/local/bin/wp plugin is-installed redis-cache --allow-root --path="$WP_PATH"; then
         echo "Installing Redis Object Cache plugin..."

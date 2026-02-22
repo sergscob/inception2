@@ -18,6 +18,6 @@ clean:
 	docker rmi -f $$(docker images -qa);\
 	docker volume rm $$(docker volume ls -q);\
 	docker network rm $$(docker network ls -q);\
-	rm -rf /home/sskobyak/data/*
+	sudo rm -rf /home/sskobyak/data/*
 
 .PHONY: all re down clean 
