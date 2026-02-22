@@ -10,7 +10,7 @@ This document explains in clear and simple terms how to use and manage the Incep
 
 The project deploys a complete web infrastructure composed of multiple services running in Docker containers.
 
-## 🌐 Web Services
+## Web Services
 
 ### 1. NGINX
 - Acts as the HTTPS entry point
@@ -24,15 +24,15 @@ The project deploys a complete web infrastructure composed of multiple services 
 
 ### 3. VueApp
 - Frontend application
-- Available at: `http://localhost:8080`
+- Available at: `https://vue.sskobyak.42.fr`
 
 ### 4. Profile
 - Static website
-- Available at: `http://localhost:8081`
+- Available at: `https://profile.sskobyak.42.fr`
 
 ---
 
-## 🗄 Database Services
+## Database Services
 
 ### 5. MariaDB
 - Database used by WordPress
@@ -44,7 +44,7 @@ The project deploys a complete web infrastructure composed of multiple services 
 
 ---
 
-## ⚡ Performance & Access
+## Performance & Access
 
 ### 7. Redis
 - Caching system for WordPress
@@ -56,9 +56,9 @@ The project deploys a complete web infrastructure composed of multiple services 
 
 ---
 
-## 📊 Monitoring & Management
+## Monitoring & Management
 
-### 9. Netdata
+### 9. Uptime Kuma
 - Real-time monitoring dashboard
 - Displays container and system metrics
 
@@ -66,72 +66,78 @@ The project deploys a complete web infrastructure composed of multiple services 
 - Docker management interface
 - Allows container and volume management
 
+### 12. Monitoring script
+- Checks website availability and sends alerts on Telegram
+
+
 ---
 
 # 2. Starting and Stopping the Project
 
-## 🔹 Start the Project
+## Start the Project
 
 From the root of the project:
 
 ```bash
-docker compose up --build
-```
-
-Run in background:
-
-```bash
-docker compose up -d --build
+make all
 ```
 
 ---
 
-## 🔹 Stop the Project
+## Stop the Project
 
 ```bash
-docker compose down
+make down
 ```
 
 ---
 
-## 🔹 Stop and Remove Volumes
+## Stop and Remove Volumes
 
 ⚠️ This will delete stored data (database + WordPress files):
 
 ```bash
-docker compose down -v
+make clean
 ```
 
 ---
 
 # 3. Accessing the Website and Administration Panels
 
-## 🌍 WordPress Website
+## WordPress Website
 
 ```
-https://localhost
+https://sskobyak.42.fr
 ```
-
 (Uses HTTPS on port 443)
 
 ---
 
-## ⚙ WordPress Admin Panel
+## WordPress Admin Panel
 
 ```
-https://localhost/wp-admin
+https://sskobyak.42.fr/wp-admin
 ```
 
 Use credentials defined in `.env`.
 
+WP_ADMIN_USER=admin
+WP_ADMIN_PASSWORD=admin_pass
+WP_ADMIN_EMAIL=admin@example.com
+
+WP_SECOND_USER=editor
+WP_SECOND_USER_PASSWORD=editor123
+WP_SECOND_USER_EMAIL=editor@example.com
+WP_SECOND_USER_ROLE=editor
+
 ---
 
-## 🗄 Adminer (Database Management)
+## Adminer (Database Management)
 
 If exposed in your configuration:
 
 ```
-http://localhost:<adminer_port>
+https://sskobyak.42.fr/adminer
 ```
 
 Login with:
@@ -145,42 +151,40 @@ Login with:
 ## 📦 Portainer (Docker Management)
 
 ```
-http://localhost:9000
+https://sskobyak.42.fr/portainer
 ```
 
 First login requires creation of admin account.
 
 ---
 
-## 📊 Netdata (Monitoring)
-
-If exposed:
+## Uptime Kuma (Monitoring)
 
 ```
-http://localhost:<netdata_port>
+https://uptime.sskobyak.42.fr
 ```
 
 Displays system and container metrics.
 
 ---
 
-## 💻 Vue App
+## Vue App
 
 ```
-http://localhost:8080
-```
-
----
-
-## 👤 Profile Site
-
-```
-http://localhost:8081
+https://vue.sskobyak.42.fr
 ```
 
 ---
 
-## 📁 FTP Access
+## Profile Site
+
+```
+http://profile.sskobyak.42.fr
+```
+
+---
+
+## FTP Access
 
 - Host: localhost
 - Port: 21
@@ -205,19 +209,18 @@ Typical variables include:
 
 ---
 
-## 🔐 How to Change Credentials
+## How to Change Credentials
 
 1. Edit the `.env` file.
 2. Restart containers:
 
 ```bash
-docker compose down
-docker compose up -d --build
+make re
 ```
 
 ---
 
-## 📂 Persistent Data Locations
+## Persistent Data Locations
 
 Database data:
 ```
@@ -235,7 +238,7 @@ You can inspect or back up these directories directly from the host.
 
 # 5. Checking That Services Are Running Correctly
 
-## 🔎 Check Running Containers
+## Check Running Containers
 
 ```bash
 docker ps
@@ -245,7 +248,7 @@ All services should show status: `Up`.
 
 ---
 
-## 📋 Check Logs
+## Check Logs
 
 View logs of a specific service:
 
@@ -262,22 +265,15 @@ docker logs nginx
 
 ---
 
-## 🧪 Test Website
+## Test Website
 
-- Open `https://localhost`
+- Open `https://sskobyak.42.fr`
 - Ensure page loads correctly
 - Login to `/wp-admin`
 
 ---
 
-## 📊 Monitor with Netdata
-
-- Check CPU, RAM usage
-- Verify all containers are active
-
----
-
-## 📦 Verify Network Connectivity
+## Verify Network Connectivity
 
 Inside a container:
 

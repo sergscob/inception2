@@ -9,18 +9,19 @@ The goal is to deploy a complete, containerized web ecosystem composed of multip
 
 The infrastructure includes:
 
-- NGINX (HTTPS reverse proxy)
-- WordPress (PHP-FPM)
-- MariaDB (database)
-- FTP server
-- Redis (cache)
-- Adminer (database management)
-- Vue.js application
-- Profile static site
-- Netdata (monitoring)
-- Portainer (Docker management UI)
+- **NGINX** (HTTPS reverse proxy)
+- **WordPress** (PHP-FPM) with admin and secondary user
+- **MariaDB** (database)
+- **FTP server**
+- **Redis** (cache)
+- **Adminer** (database management)
+- **Vue.js application**
+- **Profile static site**
+- **Portainer** (Docker management UI)
+- **Site Monitor** (checks website availability and sends alerts on Telegram)
+- **Uptime Kuma** (website uptime monitoring)
 
-All services are connected via a custom Docker bridge network and built from custom Dockerfiles (except Portainer).
+All services are connected via a custom Docker bridge network and built from custom Dockerfiles.
 
 ---
 
@@ -29,14 +30,15 @@ All services are connected via a custom Docker bridge network and built from cus
 ### Core Web Stack
 
 - **NGINX**
-  - Only public HTTPS entry point (443)
-  - Serves WordPress content
-  - Uses shared volume with WordPress
+  - Public HTTPS entry point (443)
+  - Serves WordPress content and routes other services
+  - Shared volume with WordPress
 
 - **WordPress**
   - Connected to MariaDB
-  - Uses Redis for caching
+  - Uses Redis for object caching
   - Persistent storage via `wp_data` volume
+  - Supports two users (admin and secondary)  
 
 - **MariaDB**
   - Database backend for WordPress
@@ -51,25 +53,29 @@ All services are connected via a custom Docker bridge network and built from cus
   - Passive ports: 30000–30009
 
 - **Redis**
-  - Improves WordPress performance
+  - Improves WordPress performance via object caching
 
 - **Adminer**
   - Lightweight DB management interface
+  - Available at `https://sskobyak.42.fr/adminer/`
 
 - **VueApp**
-  - Frontend app available at `http://localhost:8080`
+  - Frontend application available at `https://vue.sskobyak.42.fr`
 
 - **Profile**
-  - Static site available at `http://localhost:8081`
-
-- **Netdata**
-  - Real-time monitoring
-  - Access to Docker metrics
-  - Uses dedicated volumes for configuration and cache
+  - Static site available at `https://profile.sskobyak.42.fr`
 
 - **Portainer**
   - Docker container management UI
-  - Available at `http://localhost:9000`
+  - Available at `https://sskobyak.42.fr/portainer/`
+
+- **Site Monitor**
+  - Monitors availability of configured websites
+  - Sends alerts via Telegram 
+
+- **Uptime Kuma**
+  - Tracks uptime and response times of websites
+  - Accessible at `https://uptime.sskobyak.42.fr/`
 
 ---
 
@@ -80,17 +86,21 @@ All services are connected via a custom Docker bridge network and built from cus
 ├── docker-compose.yml
 ├── .env
 ├── srcs/
-│   ├── mariadb/
-│   ├── wordpress/
-│   ├── nginx/
-│   ├── ftp/
-│   ├── redis/
-│   ├── adminer/
-│   ├── vueapp/
-│   ├── profile/
-│   └── netdata/
+│ ├── mariadb/
+│ ├── wordpress/
+│ ├── nginx/
+│ ├── ftp/
+│ ├── redis/
+│ ├── adminer/
+│ ├── vueapp/
+│ ├── profile/
+│ ├── site_monitor/
+│ ├── uptime/
+│ └── portainer/
 └── README.md
+
 ```
+
 
 Each service has its own `Dockerfile` and configuration inside `srcs/`.
 
@@ -119,8 +129,7 @@ Each service has its own `Dockerfile` and configuration inside `srcs/`.
 | Visible in container metadata | Hidden from inspect |
 | Suitable for development | Suitable for production |
 
-In this project, credentials are managed via `.env` file.  
-In production environments, Docker Secrets would be preferable for improved security.
+In this project, credentials for WordPress secondary user can be managed via `.env`.  
 
 ---
 
@@ -132,10 +141,7 @@ In production environments, Docker Secrets would be preferable for improved secu
 | Container name resolution | No isolation |
 | More secure | Less secure |
 
-A custom bridge network is used to:
-- Isolate services
-- Enable internal DNS resolution
-- Prevent unnecessary host exposure
+A custom bridge network isolates services and enables internal DNS resolution.
 
 ---
 
@@ -147,14 +153,10 @@ A custom bridge network is used to:
 | Portable | Host-dependent |
 | Cleaner abstraction | Easier manual access |
 
-This project uses bind mounts for persistent data:
+Bind mounts are used for persistent data:
 
-- `/home/sskobyak/data/db`
-- `/home/sskobyak/data/wp`
-
-This allows:
-- Full control over stored data
-- Easy inspection from host system
+- `/home/sskobyak/data/db` — MariaDB database
+- `/home/sskobyak/data/wp` — WordPress files
 
 ---
 
@@ -163,7 +165,7 @@ This allows:
 ### Requirements
 
 - Docker
-- Docker Compose (v2+ recommended)
+- Docker Compose
 
 Check installation:
 
@@ -171,8 +173,6 @@ Check installation:
 docker --version
 docker compose version
 ```
-
----
 
 ### Setup
 
@@ -192,31 +192,46 @@ mkdir -p /home/sskobyak/data/wp
 
 3. Configure environment variables in `.env`
 
+MYSQL_ROOT_PASSWORD=your_root_password
+MYSQL_DATABASE=wordpress
+MYSQL_USER=wordpress_user
+MYSQL_PASSWORD=your_password
+
+WP_ADMIN_USER=admin
+WP_ADMIN_PASSWORD=admin_pass
+WP_ADMIN_EMAIL=admin@example.com
+
+# Optional second user
+WP_SECOND_USER=editor
+WP_SECOND_USER_PASSWORD=editor123
+WP_SECOND_USER_EMAIL=editor@example.com
+WP_SECOND_USER_ROLE=editor
+
+# Telegram for site monitor (optional)
+TELEGRAM_TOKEN=<your_bot_token>
+TELEGRAM_CHAT_ID=<chat_id>
+
 ---
 
 ### Build & Run
 
 ```bash
-docker compose up --build
-```
-
-Run in background:
-
-```bash
-docker compose up -d --build
+make all
 ```
 
 ---
 
 ## Access Points
 
-| Service | URL |
-|----------|------|
-| WordPress (HTTPS) | https://localhost |
-| Vue App | http://localhost:8080 |
-| Profile Site | http://localhost:8081 |
-| Portainer | http://localhost:9000 |
-| FTP | port 21 |
+| Service           | URL / Port                                                                    |
+| ----------------- | ----------------------------------------------------------------------------- |
+| WordPress (HTTPS) | [https://sskobyak.42.fr/](https://sskobyak.42.fr/)                            |
+| Vue App           | [https://vue.sskobyak.42.fr/](https://vuesskobyak.42.fr/)                     |
+| Profile Site      | [https://profile.sskobyak.42.fr/](https://profile.sskobyak.42.fr/)            |
+| Portainer         | [https://sskobyak.42.fr/portainer](https://sskobyak.42.fr/portainer)          |
+| FTP               | port 21                                                                       |
+| Uptime            | [https://uptime.sskobyak.42.fr](https://uptime.sskobyak.42.fr)                |
+| Adminer           | [https://sskobyak.42.fr/adminer/](https://sskobyak.42.fr/adminer)             |
 
 ---
 
@@ -239,6 +254,7 @@ docker compose up -d --build
 - Redis Documentation – https://redis.io/documentation
 - Netdata Documentation – https://learn.netdata.cloud/
 - Portainer Documentation – https://docs.portainer.io/
+- Uptime Kuma – https://uptime.kuma.pet/
 
 ---
 

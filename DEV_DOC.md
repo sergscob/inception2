@@ -12,9 +12,8 @@ This document explains how a developer can set up, build, run, and manage the In
 
 Before starting, ensure the following are installed:
 
-- Docker (Engine 20.10+ recommended)
-- Docker Compose (v2+ recommended)
-- GNU Make
+- Docker 
+- Docker Compose 
 
 Check installation:
 
@@ -28,8 +27,8 @@ If Docker is not installed:
 
 Ubuntu:
 ```bash
-sudo apt update
-sudo apt install docker.io docker-compose-plugin
+sudo apk update
+sudo apk install docker.io docker-compose-plugin
 ```
 
 Enable Docker:
@@ -84,10 +83,19 @@ Typical variables include:
 - WORDPRESS_DB_NAME
 - WORDPRESS_DB_USER
 - WORDPRESS_DB_PASSWORD
-- WP_ADMIN_USER
-- WP_ADMIN_PASSWORD
 - FTP_USER
 - FTP_PASSWORD
+- WP_ADMIN_USER=admin
+- WP_ADMIN_PASSWORD=admin_pass
+- WP_ADMIN_EMAIL=admin@example.com
+# Optional second user
+- WP_SECOND_USER=editor
+- WP_SECOND_USER_PASSWORD=editor123
+- WP_SECOND_USER_EMAIL=editor@example.com
+# Telegram for site monitor (optional)
+- TELEGRAM_TOKEN=<your_bot_token>
+- TELEGRAM_CHAT_ID=<chat_id>
+
 
 Steps:
 
@@ -103,13 +111,10 @@ Steps:
 
 If a Makefile is provided, common targets may include:
 
-```bash
-make
-```
-→ Builds and starts containers.
+Builds and starts containers.
 
 ```bash
-make up
+make all
 ```
 → Starts containers.
 
@@ -119,7 +124,7 @@ make down
 → Stops containers.
 
 ```bash
-make fclean
+make clean
 ```
 → Stops containers and removes volumes.
 
@@ -265,22 +270,6 @@ Stores:
 
 ---
 
-## 4.3 Monitoring & Management Data
-
-Netdata volumes:
-
-- netdata_lib
-- netdata_cache
-- netdata_config
-
-Portainer volume:
-
-- portainer_data
-
-These are managed automatically by Docker.
-
----
-
 # 5. Networking
 
 All services are connected to a custom bridge network:
@@ -323,7 +312,7 @@ docker compose build --no-cache
 
 # 7. Clean Reinstallation (Full Reset)
 
-⚠ This removes all containers and persistent data.
+This removes all containers and persistent data.
 
 ```bash
 docker compose down -v
