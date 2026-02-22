@@ -58,15 +58,7 @@ The project deploys a complete web infrastructure composed of multiple services 
 
 ## Monitoring & Management
 
-### 9. Uptime Kuma
-- Real-time monitoring dashboard
-- Displays container and system metrics
-
-### 10. Portainer
-- Docker management interface
-- Allows container and volume management
-
-### 12. Monitoring script
+### 9. Monitoring script
 - Checks website availability and sends alerts on Telegram
 
 

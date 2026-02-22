@@ -19,7 +19,6 @@ The infrastructure includes:
 - **Profile static site**
 - **Portainer** (Docker management UI)
 - **Site Monitor** (checks website availability and sends alerts on Telegram)
-- **Uptime Kuma** (website uptime monitoring)
 
 All services are connected via a custom Docker bridge network and built from custom Dockerfiles.
 
@@ -73,10 +72,6 @@ All services are connected via a custom Docker bridge network and built from cus
   - Monitors availability of configured websites
   - Sends alerts via Telegram 
 
-- **Uptime Kuma**
-  - Tracks uptime and response times of websites
-  - Accessible at `https://uptime.sskobyak.42.fr/`
-
 ---
 
 ## Project Structure
@@ -95,7 +90,6 @@ All services are connected via a custom Docker bridge network and built from cus
 │ ├── vueapp/
 │ ├── profile/
 │ ├── site_monitor/
-│ ├── uptime/
 │ └── portainer/
 └── README.md
 
@@ -230,7 +224,6 @@ make all
 | Profile Site      | [https://profile.sskobyak.42.fr/](https://profile.sskobyak.42.fr/)            |
 | Portainer         | [https://sskobyak.42.fr/portainer](https://sskobyak.42.fr/portainer)          |
 | FTP               | port 21                                                                       |
-| Uptime            | [https://uptime.sskobyak.42.fr](https://uptime.sskobyak.42.fr)                |
 | Adminer           | [https://sskobyak.42.fr/adminer/](https://sskobyak.42.fr/adminer)             |
 
 ---
@@ -254,7 +247,6 @@ make all
 - Redis Documentation – https://redis.io/documentation
 - Netdata Documentation – https://learn.netdata.cloud/
 - Portainer Documentation – https://docs.portainer.io/
-- Uptime Kuma – https://uptime.kuma.pet/
 
 ---
 
