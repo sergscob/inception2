@@ -106,6 +106,17 @@ services:
     networks:
       - network
 
+  uptime:
+    build: ./srcs/uptime
+    container_name: uptime
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    volumes:
+      - uptime_data:/app/data
+    networks:
+      - network
+
 volumes:
   db_data:
     driver: local
@@ -122,6 +133,7 @@ volumes:
       o: bind
 
   portainer_data:
+  uptime_data:
 
 networks:
   network:
