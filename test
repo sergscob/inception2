@@ -30,3 +30,10 @@ ftp localhost
 REDIS ==============================
 docker exec -it wordpress sh
 php81 -r '$r = new Redis(); var_dump($r->connect("redis", 6379));'
+
+
+
+SECRETS
+docker swarm init
+echo "editor123" | docker secret create wp_second_user_password -
+docker secret ls

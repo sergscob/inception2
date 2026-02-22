@@ -22,6 +22,8 @@ services:
       - mariadb
     networks:
       - network
+    # secrets:
+    #   - wp_second_user_password
 
   nginx:
     build: ./srcs/nginx
@@ -138,3 +140,7 @@ volumes:
 networks:
   network:
     driver: bridge
+
+# secrets:
+#   wp_second_user_password:
+#     external: true    
